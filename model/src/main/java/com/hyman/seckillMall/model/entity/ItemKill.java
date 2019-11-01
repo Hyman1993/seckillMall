@@ -24,6 +24,7 @@ public class ItemKill {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
+    // 秒杀商品名
     private String itemName;
 
     //采用服务器时间控制是否可以进行抢购
