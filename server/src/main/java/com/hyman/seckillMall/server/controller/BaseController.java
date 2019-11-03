@@ -31,4 +31,9 @@ public class BaseController {
         return "welcome";
     }
 
+    @RequestMapping(value="/error",method=RequestMethod.GET)
+    public String error(){
+        return "error";
+    }
+
 }

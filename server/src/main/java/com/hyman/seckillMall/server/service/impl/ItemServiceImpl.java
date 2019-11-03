@@ -33,4 +33,21 @@ public class ItemServiceImpl implements IItemService {
     public List<ItemKill> getKillItems() throws Exception {
         return itemKillMapper.selectAll();
     }
+
+    /**
+     * 获取秒杀详情
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public ItemKill getKillDetail(Integer id) throws Exception {
+        ItemKill entity = itemKillMapper.selectById(id);
+        if(entity == null){
+            throw new Exception("获取秒杀详情-待秒杀商品记录不存在");
+        }
+        return entity;
+    }
+
+
 }
