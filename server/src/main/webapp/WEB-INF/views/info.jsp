@@ -48,7 +48,7 @@
     function executeKill() {
         $.ajax({
             type: "POST",
-            url: "${ctx}/kill/execute",
+            url: "${ctx}/secKill/execute",
             contentType: "application/json;charset=utf-8",
             data: JSON.stringify(getJsonData()),
             dataType: "json",
@@ -56,10 +56,10 @@
             success: function(res){
                 if (res.code==0) {
                     //alert(res.msg);
-                    window.location.href="${ctx}/kill/execute/success"
+                    window.location.href="${ctx}/secKill/execute/success"
                 }else{
                     //alert(res.msg);
-                    window.location.href="${ctx}/kill/execute/fail"
+                    window.location.href="${ctx}/secKill/execute/fail"
                 }
             },
             error: function (message) {
@@ -76,7 +76,8 @@
             "userId":1
         };*/
         var data = {
-            "killId":killId
+            "killId":killId,
+            "userId":10
         };
         return data;
     }

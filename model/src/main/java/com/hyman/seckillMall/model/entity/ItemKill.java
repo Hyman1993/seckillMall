@@ -29,4 +29,5 @@ public class ItemKill {
 
     //采用服务器时间控制是否可以进行抢购
     private Integer canKill;
+
 }
