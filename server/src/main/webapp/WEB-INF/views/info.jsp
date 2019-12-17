@@ -77,7 +77,7 @@
         };*/
         var data = {
             "killId":killId,
-            "userId":10
+            "userId":1
         };
         return data;
     }

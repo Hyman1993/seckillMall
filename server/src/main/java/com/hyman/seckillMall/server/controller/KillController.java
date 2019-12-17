@@ -46,11 +46,11 @@ public class KillController {
             return new BaseResponse(StatusCode.InvalidParams);
         }
         Object uId=session.getAttribute("uid");
-        if (uId==null){
-            return new BaseResponse(StatusCode.UserNotLogin);
-        }
-        //Integer userId=dto.getUserId();
-        Integer userId= (Integer)uId ;
+        //if (uId==null){
+        //    return new BaseResponse(StatusCode.UserNotLogin);
+        //}
+        Integer userId=dto.getUserId();
+        //Integer userId= (Integer)uId ;
 
         BaseResponse response = new BaseResponse(StatusCode.Success);
         try {

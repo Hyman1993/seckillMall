@@ -1,6 +1,7 @@
 package com.hyman.seckillMall.model.mapper;
 
 
+import com.hyman.seckillMall.model.dto.KillSuccessUserInfo;
 import com.hyman.seckillMall.model.entity.ItemKillSuccess;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,7 +22,7 @@ public interface ItemKillSuccessMapper {
 
     int countByKillUserId(@Param("killId") Integer killId, @Param("userId") Integer userId);
 
-  //  KillSuccessUserInfo selectByCode(@Param("code") String code);
+    KillSuccessUserInfo selectByCode(@Param("code") String code);
 
     int expireOrder(@Param("code") String code);
 

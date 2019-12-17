@@ -118,7 +118,7 @@
   </select>
 
   <!--根据秒杀成功后的订单编码查询-->
-<!--  <select id="selectByCode" resultType="com.hyman.seckillMall.model.dto.KillSuccessUserInfo">
+ <select id="selectByCode" resultType="com.hyman.seckillMall.model.dto.KillSuccessUserInfo">
     SELECT
       a.*,
       b.user_name,
@@ -130,7 +130,7 @@
       LEFT JOIN item c ON c.id = a.item_id
     WHERE a.code = #{code}
           AND b.is_active = 1
-  </select>-->
+  </select>
 
   <!--失效更新订单信息-->
   <update id="expireOrder">
