@@ -97,6 +97,9 @@ public class KillServiceImpl implements KillService {
                 //TODO:进行异步邮件消息的通知=rabbitmq+mail
                 rabbitSenderService.sendKillSuccessEmailMsg(orderNo);
 
+                //TODO:入死信队列,用于"失效"超过指定的TTL时间仍然未支付的订单
+                rabbitSenderService.sendKillSuccessOrderExpireMsg(orderNo);
+
             }
         }
     }

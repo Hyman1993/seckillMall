@@ -11,4 +11,6 @@ import org.springframework.stereotype.Service;
 public interface RabbitSenderService {
 
    void sendKillSuccessEmailMsg(String orderNo);
+
+   void sendKillSuccessOrderExpireMsg(String orderCode);
 }

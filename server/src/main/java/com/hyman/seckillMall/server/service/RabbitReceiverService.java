@@ -11,4 +11,6 @@ import org.springframework.stereotype.Service;
 public interface RabbitReceiverService {
 
     void consumeEmailMsg(KillSuccessUserInfo info);
+
+    void consumeExpireOrder(KillSuccessUserInfo info);
 }
