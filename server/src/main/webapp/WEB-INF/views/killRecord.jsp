@@ -10,7 +10,7 @@
 <div class="container">
     <div class="panel panel-default">
         <div class="panel-body">
-            <h2>当前用户名：</h2><h2 class="text-danger">${info.userName}</h2>
+            <h2>当前用户名：</h2><h2 class="text-danger">${info.username}</h2>
         </div>
         <div class="panel-body">
             <h2>抢购的商品名称：</h2><h2 class="text-danger">${info.itemName}</h2>

@@ -69,7 +69,6 @@ public class KillServiceImpl implements KillService {
         return result;
     }
 
-
     /**
      * 通用的方法-记录用户秒杀成功后生成的订单-并进行异步邮件消息的通知
      * @param kill
@@ -90,6 +89,7 @@ public class KillServiceImpl implements KillService {
         entity.setStatus(SysConstant.OrderStatus.SuccessNotPayed.getCode().byteValue());
         entity.setCreateTime(DateTime.now().toDate());
         //TODO:学以致用，举一反三 -> 仿照单例模式的双重检验锁写法
+        // 根据用户id和订单id查询该用户的抢购数量
         if (itemKillSuccessMapper.countByKillUserId(kill.getId(),userId) <= 0){
             int res=itemKillSuccessMapper.insertSelective(entity);
 
@@ -102,5 +102,39 @@ public class KillServiceImpl implements KillService {
 
             }
         }
+    }
+
+    /**
+     *
+     * @param killId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Boolean killItemV2(Integer killId, Integer userId) throws Exception {
+        Boolean result=false;
+
+        //TODO:判断当前用户是否已经抢购过当前商品
+        if (itemKillSuccessMapper.countByKillUserId(killId,userId) <= 0){
+            //TODO:查询待秒杀商品详情
+            ItemKill itemKill=itemKillMapper.selectByIdV2(killId);
+
+            //TODO:判断是否可以被秒杀canKill=1?
+            if (itemKill!=null && 1==itemKill.getCanKill() && itemKill.getTotal() > 0){
+                //TODO:扣减库存-减一
+                int res=itemKillMapper.updateKillItemV2(killId);
+
+                //TODO:扣减是否成功?是-生成秒杀成功的订单，同时通知用户秒杀成功的消息
+                if (res>0){
+                    commonRecordKillSuccessInfo(itemKill,userId);
+
+                    result=true;
+                }
+            }
+        }else{
+            throw new Exception("您已经抢购过该商品了!");
+        }
+        return result;
     }
 }
