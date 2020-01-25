@@ -11,6 +11,8 @@ import com.hyman.seckillMall.server.utils.RandomUtil;
 import com.hyman.seckillMall.server.utils.SnowFlake;
 import org.apache.commons.lang3.RandomUtils;
 import org.joda.time.DateTime;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class KillServiceImpl implements KillService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 商品秒杀核心业务逻辑的处理
@@ -167,6 +172,7 @@ public class KillServiceImpl implements KillService {
             final String key = new StringBuffer().append(killId).append(userId).append("-redisLock").toString();
             final String value = RandomUtil.generateOrderCode();
             Boolean cacheRes = valueOperations.setIfAbsent(key,value);
+            // TODO:redis部署节点宕机了，但是Redis锁的key会永远存在数据库中，意味着即使重启还是被锁住了
             if(cacheRes){
                 stringRedisTemplate.expire(key,30, TimeUnit.SECONDS);
                 try{
@@ -190,6 +196,7 @@ public class KillServiceImpl implements KillService {
                 }catch(Exception e){
                      throw new Exception("还没到抢购日期、已过了抢购时间或已被抢购完毕！");
                 }finally {
+                    // TODO:必须释放锁
                     if(value.equals(valueOperations.get(key).toString())){
                         stringRedisTemplate.delete(key);
                     }
@@ -201,6 +208,56 @@ public class KillServiceImpl implements KillService {
         }else{
             throw new Exception("Redis-您已经抢购过该商品了!");
         }
+        return result;
+    }
+
+    /**
+     * 商品秒杀核心业务逻辑的处理-redisson的分布式锁
+     * @param killId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Boolean killItemV4(Integer killId, Integer userId) throws Exception {
+        Boolean result=false;
+
+        final String lockKey = new StringBuffer().append(killId).append(userId).append("-RedissonLock").toString();
+        RLock lock =redissonClient.getLock(lockKey);
+
+        try{
+            //lock.lock(10,TimeUnit.SECONDS);
+            Boolean chacheRes = lock.tryLock(30,10,TimeUnit.SECONDS);
+            // 获取到锁的情况下
+            if(chacheRes){
+                //TODO:判断当前用户是否已经抢购过当前商品
+                if (itemKillSuccessMapper.countByKillUserId(killId,userId) <= 0){
+                    //TODO:查询待秒杀商品详情
+                    ItemKill itemKill=itemKillMapper.selectByIdV2(killId);
+
+                    //TODO:判断是否可以被秒杀canKill=1?
+                    if (itemKill!=null && 1==itemKill.getCanKill() && itemKill.getTotal() > 0){
+                        //TODO:扣减库存-减一
+                        int res=itemKillMapper.updateKillItemV2(killId);
+
+                        //TODO:扣减是否成功?是-生成秒杀成功的订单，同时通知用户秒杀成功的消息
+                        if (res>0){
+                            commonRecordKillSuccessInfo(itemKill,userId);
+
+                            result=true;
+                        }
+                    }
+                }else{
+                    throw new Exception("Redis-您已经抢购过该商品了!");
+                }
+
+            }
+
+        }finally {
+           lock.unlock();
+        }
+
+
         return result;
     }
 }
